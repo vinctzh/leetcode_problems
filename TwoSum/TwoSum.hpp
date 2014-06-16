@@ -7,37 +7,56 @@
 
 	Input: numbers={2, 7, 11, 15}, target=9
 	Output: index1=1, index2=2
-	Copyright ©2014 Vincent Zhang 
+	Copyright © 2014 Vincent Zhang 
 	Blog: http://www.centvin.com 
 */
 #include <vector>
+#include <map>
 #include <iostream>
 using namespace std;
 
 class Solution {
 public:
 	vector<int> twoSum(vector<int> &numbers, int target) {
-		inds.clear();
-		size = numbers.size();
-		this->numbers = numbers;
-		for (int i=0;i<ceil(double(size)/2);i++) {
-			if (twoSumFound(i,target))  break;
+		return twoSum_map(numbers,target);
+	}
+
+private:
+	// O(n*n)  rejec for "time limit exceed"
+	vector<int> twoSumOn2(vector<int> &numbers, int target) {
+		vector<int> inds;
+		int countNums = numbers.size();
+		for (int i=0; i<countNums-1;i++) {
+			int curFirst = numbers[i];
+			for (int j=i+1;j<countNums;j++) {
+				if ((curFirst + numbers[j] == target)) {
+					inds.push_back(i+1);
+					inds.push_back(j+1);
+					return inds;
+				}
+			}
 		}
 		return inds;
 	}
 
-private:
-	vector<int> inds; 
-	vector<int> numbers;
-	int size;
-	bool twoSumFound(int cur_ind, int target){
-		for (int i=cur_ind+1;i<size; i++) {
-			if (numbers[i]+numbers[cur_ind] == target) {
-				inds.push_back(cur_ind+1);
+	// O(nlog(n)) with map<K,V>
+	vector<int> twoSum_map(vector<int> &numbers, int target) {
+		int countNums = numbers.size();
+		vector<int> inds;
+
+		map<int, int> numbers_map;
+		for (int i=0;i<countNums;i++) 
+			numbers_map[numbers[i]] = i;	// use the value of the number as key, and the index as the value of the map.
+
+		map<int,int>::iterator it;
+		for (int i=0; i<countNums;i++) {
+			it = numbers_map.find(target-numbers[i]);
+			if (it != numbers_map.end() && it->second != i ) {
 				inds.push_back(i+1);
-				return true;
+				inds.push_back(it->second+1);
+				return inds;
 			}
 		}
-		return false;
+		return inds;
 	}
 };
